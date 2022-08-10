@@ -126,7 +126,7 @@ hr {
     </div>
   </header>
     <div id="id01" class="modal">
-      <form class="modal-content" method="dialog">
+      <form class="modal-content" onsubmit="return checkForm(this);">
         <div class="container">
           <h3>Sign up</h3>
           <p>Please enter your username</p>
@@ -142,7 +142,7 @@ hr {
           <p>By joining you agree to our <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" style="color:dodgerblue">Terms & Privacy</a>.</p>
     
           <div class="clearfix">
-            <button type="button1" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Sign Up</button>
+            <button type="button1" class="cancelbtn">Sign Up</button>
           </div>
         </div>
       </form>
@@ -158,9 +158,6 @@ hr {
   const socket = io();
   typing = []
   const rember = document.querySelector('#accept');
-//slow delete cookie
-var m = new Date();
-m.setMonth(m.getMonth() + 1);
   let Username = window.localStorage.getItem('username');
   document.getElementById('id02').innerHTML = "Username: " + Username;
   const modal = document.getElementById("id01");
@@ -235,5 +232,35 @@ m.setMonth(m.getMonth() + 1);
     }
   });
 </script>
+    <script>
+
+      function checkForm(form)
+      {
+        // validation fails if the input is blank
+        if(form.inputfield.value == "") {
+          alert("Error: Input is empty!");
+          form.inputfield.focus();
+          return false;
+        }
+
+        // regular expression to match only alphanumeric characters and spaces
+        var re = /^[\w ]+$/;
+
+        // validation fails if the input doesn't match our regular expression
+        if(!re.test(form.inputfield.value)) {
+          alert("Error: Input contains invalid characters!");
+          form.inputfield.focus();
+          return false;
+        }
+        // if input is too long return false
+        if(form.input.value.length > 20) {
+          alert("Error: Input is more than 20 characters!");
+        }
+
+        // validation was successful
+        document.getElementById('id01').style.display='none'
+      }
+
+    </script>
   </body>
 </html>
