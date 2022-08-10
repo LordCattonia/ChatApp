@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chat</title>
+    <style>
+      
+      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+      #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+      #input:focus { outline: none; }
+      #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+      #boxBoy { position: relative; bottom: 0;}
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages > li { padding: 0.5rem 1rem; }
+      #messages > li:nth-child(odd) { background: #efefef; }
+      #typing { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: absolute; bottom: 3.5%; left: 0; right: 0; display: flex; box-sizing: border-box; backdrop-filter: blur(10px); }
+      * {box-sizing: border-box}
+/* Full-width input fields */
+  input[type=text], input[type=password] {
+  width: 100%;
+  padding: 15px;
+  margin: 5px 0 22px 0;
+  display: inline-block;
+  border: none;
+  background: #f1f1f1;
+}
+
+/* Add a background color when the inputs get focus */
+input[type=text]:focus, input[type=password]:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
+/* Set a style for all buttons */
+.button1 {
+  background-color: #04AA6D;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  opacity: 0.9;
+}
+
+.button1:hover {
+  opacity:1;
+}
+
+/* Extra styles for the cancel button */
+.cancelbtn {
+  padding: 14px 20px;
+  background-color: #33ff4b;
+}
+
+/* This will align items right :) */
+.Opposites {
+  display: flex;
+  justify-content: space-between;
+}
+
+
+/* Add padding to container elements */
+.container {
+  padding: 16px;
+}
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Fuck. It reloads the page */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: #474e5d;
+  padding-top: 50px;
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+  border: 1px solid #888;
+  width: 40%; /* Could be more or less, depending on screen size */
+}
+
+header{
+  background: #a1a1a1;
+  color: #eeeeee;
+  padding: 1px;
+  font-size: small;
+  box-sizing: content-box;
+}
+
+/* Style the horizontal ruler */
+hr {
+  border: 1px solid #f1f1f1;
+  margin-bottom: 25px;
+}
+
+
+/* Clear floats */
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+/* Change styles for cancel button and signup button on extra small screens */
+@media screen and (max-width: 300px) {
+  .cancelbtn, .signupbtn {
+    width: 100%;
+  }
+}
+    </style>
+  </head>
+
+  <body>
+    <header class="topBar">
+    <div class="Opposites">
+      <h1 style="display: inline-block;" id="id02">Username: </h1>
+      <button onclick="document.getElementById('id01').style.display='block'" id="userbtn">Change Username</button>
+    </div>
+  </header>
+    <div id="id01" class="modal">
+      <form class="modal-content" method="dialog">
+        <div class="container">
+          <h3>Sign up</h3>
+          <p>Please enter your username</p>
+          <hr>
+    
+          <label id="Usrnm"><b>Username</b></label>
+          <input placeholder="Enter username" name="userbox" id="userbox" required>
+          <br>
+          <label>
+            <input type="checkbox" id="accept" style="margin-bottom:15px"> Remember me
+          </label>
+    
+          <p>By joining you agree to our <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" style="color:dodgerblue">Terms & Privacy</a>.</p>
+    
+          <div class="clearfix">
+            <button type="button1" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Sign Up</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <ul id="messages"></ul>
+      <p id="typing" style="display: none;">If you see this something has gone horribly wrong</p>    
+    <form id="form" action="">
+      <input id="input" placeholder="Message" autocomplete="off" /><button>Send</button>
+    </form>
+    <script src="/socket.io/socket.io.js"></script>
+<script>
+  //im not very smart but here is my set up
+  const socket = io();
+  typing = []
+  const rember = document.querySelector('#accept');
+//slow delete cookie
+var m = new Date();
+m.setMonth(m.getMonth() + 1);
+  let Username = window.localStorage.getItem('username');
+  document.getElementById('id02').innerHTML = "Username: " + Username;
+  const modal = document.getElementById("id01");
+  const form = document.getElementById('form');
+  const username = document.getElementById('userbox');
+  const rememberMe = document.getElementsByName('remember');
+  const input = document.getElementById('input');
+  const name = document.getElementById('id02');
+  const typingThing = document.getElementById('typing');
+
+  if (window.localStorage.getItem('username') === null || (window.localStorage.getItem('username')) === ""){
+    document.getElementById('id02').innerHTML = 'No Username';
+  }
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (Username === null || Username === ""){
+      document.getElementById('id01').style.display='block';
+    }else{
+    if (input.value) {
+      socket.emit('chat message', input.value, Username);
+      socket.emit('not typing', username);
+      var item = document.createElement('li');
+    item.textContent = Username + ": " + input.value;
+    messages.appendChild(item);
+    window.scrollTo(0, document.body.scrollHeight);
+      input.value = '';
+    }}
+  });
+
+
+  modal.addEventListener('submit', function(e) {
+    window.localStorage.removeItem('username');
+    if (rember.checked == true){
+      window.localStorage.setItem('username', username.value);
+        Username = window.localStorage.getItem('username');
+        name.innerHTML = "Username: " + Username;
+    } else{
+      Username = username.value;
+      name.innerHTML = "Username: " + Username;
+    }
+  })
+  socket.on('chat message', function(msg, usr) {
+    var item = document.createElement('li');
+    item.textContent = usr + ": " + msg;
+    messages.appendChild(item);
+    window.scrollTo(0, document.body.scrollHeight);
+  });
+//ahhhhhhhhhhhhhhhhhhhhhhhhhhhh
+  document.getElementById('input').onkeypress = function() {
+    socket.emit("typing", Username);
+  }
+  window.addEventListener('keydown', function (e) {
+    if(e.key == "Backspace" || e.key == "Delete")
+    socket.emit("not typing", Username);
+  }, false);
+  socket.on("not typing", usr => {
+    typing = typing.filter(function (f) {return f !== usr});
+    if(typing.length > 0) {
+      typingThing.innerHTML = typing + " is typing";
+    } else {
+      typingThing.style.display = 'none';
+    }
+  });
+  socket.on("typing", usr => {
+    if(typing.includes(usr)){
+      void(0);
+    } else {
+      typing.push(usr);
+      typingThing.style.display = 'block';
+      typingThing.innerHTML = typing + " is typing";
+    }
+  });
+</script>
+  </body>
+</html>
