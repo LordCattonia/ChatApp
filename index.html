@@ -255,10 +255,12 @@ hr {
         // if input is too long return false
         if(form.input.value.length > 20) {
           alert("Error: Input is more than 20 characters!");
+          return false;
         }
 
         // validation was successful
-        document.getElementById('id01').style.display='none'
+        return true;
+        document.getElementById('id01').style.display='none';
       }
 
     </script>
