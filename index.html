@@ -13,7 +13,7 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages > li { padding: 0.5rem 1rem; }
       #messages > li:nth-child(odd) { background: #efefef; }
-      #typing { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: absolute; bottom: 3.5%; left: 0; right: 0; display: flex; box-sizing: border-box; backdrop-filter: blur(10px); }
+      #typing { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: absolute; bottom: 28px; left: 0; right: 0; display: flex; box-sizing: border-box; backdrop-filter: blur(10px); }
       * {box-sizing: border-box}
 /* Full-width input fields */
   input[type=text], input[type=password] {
@@ -126,14 +126,14 @@ hr {
     </div>
   </header>
     <div id="id01" class="modal">
-      <form class="modal-content" onsubmit="return checkForm(this);">
+      <form class="modal-content" method="dialog" onsubmit="return checkForm(this);">
         <div class="container">
           <h3>Sign up</h3>
           <p>Please enter your username</p>
           <hr>
     
           <label id="Usrnm"><b>Username</b></label>
-          <input placeholder="Enter username" name="userbox" id="userbox" required>
+          <input placeholder="Enter username" name="userbox" id="userbox">
           <br>
           <label>
             <input type="checkbox" id="accept" style="margin-bottom:15px"> Remember me
@@ -187,9 +187,39 @@ hr {
       input.value = '';
     }}
   });
+// Form validation
+  function checkForm(form)
+  {
+    // validation fails if the input is blank
+    if(form.userbox.value == "") {
+      alert("Error: Input is empty!");
+      form.userbox.focus();
+      return false;
+    }
 
+    // regular expression to match only alphanumeric characters and spaces
+    var re = /^[\w ]+$/;
 
-  modal.addEventListener('submit', function(e) {
+    // validation fails if the input doesn't match our regular expression
+    if(!re.test(form.userbox.value)) {
+      alert("Error: Input contains invalid characters!");
+      form.userbox.focus();
+      return false;
+    }
+    // if input is too long return false
+    if(form.userbox.value.length > 20) {
+      alert("Error: Input is more than 20 characters!");
+      return false;
+    }
+
+    // validation was successful
+
+    document.getElementById('id01').style.display='none';
+    SetUsername();
+    return true;
+  }
+
+  function SetUsername() {
     window.localStorage.removeItem('username');
     if (rember.checked == true){
       window.localStorage.setItem('username', username.value);
@@ -198,8 +228,7 @@ hr {
     } else{
       Username = username.value;
       name.innerHTML = "Username: " + Username;
-    }
-  })
+    }}
   socket.on('chat message', function(msg, usr) {
     var item = document.createElement('li');
     item.textContent = usr + ": " + msg;
@@ -232,37 +261,5 @@ hr {
     }
   });
 </script>
-    <script>
-
-      function checkForm(form)
-      {
-        // validation fails if the input is blank
-        if(form.inputfield.value == "") {
-          alert("Error: Input is empty!");
-          form.inputfield.focus();
-          return false;
-        }
-
-        // regular expression to match only alphanumeric characters and spaces
-        var re = /^[\w ]+$/;
-
-        // validation fails if the input doesn't match our regular expression
-        if(!re.test(form.inputfield.value)) {
-          alert("Error: Input contains invalid characters!");
-          form.inputfield.focus();
-          return false;
-        }
-        // if input is too long return false
-        if(form.input.value.length > 20) {
-          alert("Error: Input is more than 20 characters!");
-          return false;
-        }
-
-        // validation was successful
-        return true;
-        document.getElementById('id01').style.display='none';
-      }
-
-    </script>
   </body>
 </html>
