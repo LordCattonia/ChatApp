@@ -34,12 +34,14 @@ io.on('connection', (socket) => {
       socket.broadcast.emit('chat message', msg, usr);
     });
     socket.on("typing", (usr) => {
-        console.log(usr, "is typing");
-        socket.emit('typing', usr);
-    });
+        if(usr != null) {
+            console.log(usr, "is typing");
+            socket.broadcast.emit('typing', usr);
+            setTimeout(function(){console.log(usr, "stopped typing"); socket.broadcast.emit('not typing', usr);}, 3000);
+        }});
     socket.on("not typing", (usr) => {
         console.log(usr, "stopped typing");
-        socket.emit('not typing', usr);
+        socket.broadcast.emit('not typing', usr);
     });
   });
 
