@@ -6,7 +6,7 @@ const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
-
+var timeOut
 
 //send index.html to client
 app.get('/', (req, res) => {
@@ -37,14 +37,14 @@ io.on('connection', (socket) => {
         if(usr != null) {
             console.log(usr, "is typing");
             socket.broadcast.emit('typing', usr);
-            setTimeout(function(){console.log(usr, "stopped typing"); socket.broadcast.emit('not typing', usr);}, 3000);
+            clearTimeout(timeOut);
+            timeOut = setTimeout(function(){console.log(usr, "stopped typing"); socket.broadcast.emit('not typing', usr);}, 1000);
         }});
     socket.on("not typing", (usr) => {
         console.log(usr, "stopped typing");
         socket.broadcast.emit('not typing', usr);
     });
   });
-
 //makes sure it is connected
 server.listen(3000, () => {
     console.log('listening on port *:3000');

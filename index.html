@@ -6,7 +6,7 @@
       
       body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
       #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
-      #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+      #input { border: none; padding: 0 1rem; flex-grow: 2; border-radius: 2rem; margin: 0.25rem; }
       #input:focus { outline: none; }
       #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
       #boxBoy { position: relative; bottom: 0;}
@@ -110,18 +110,22 @@ hr {
 }
 
 /* Change styles for cancel button and signup button on extra small screens */
-@media screen and (max-width: 300px) {
+@media screen and (max-width: 401px) {
   .cancelbtn, .signupbtn {
     width: 100%;
   }
+  .modal-content{
+    width: 60%;
+  }
 }
+
     </style>
   </head>
-
   <body>
     <header class="topBar">
     <div class="Opposites">
       <h1 style="display: inline-block;" id="id02">Username: </h1>
+      <p>This application allows HTML and CSS styling for your messages. Click <a href="https://google.github.io/styleguide/htmlcssguide.html">here</a> for more info about this</p>
       <button onclick="document.getElementById('id01').style.display='block'" id="userbtn">Change Username</button>
     </div>
   </header>
@@ -135,7 +139,7 @@ hr {
           <label id="Usrnm"><b>Username</b></label>
           <input placeholder="Enter username" name="userbox" id="userbox">
           <br>
-          <label>
+          <label> 
             <input type="checkbox" id="accept" style="margin-bottom:15px"> Remember me
           </label>
     
@@ -150,16 +154,21 @@ hr {
     <ul id="messages"></ul>
       <p id="typing" style="display: none;">If you see this something has gone horribly wrong</p>    
     <form id="form" action="">
-      <input id="input" placeholder="Message" autocomplete="off" /><button>Send</button>
+      <input id="input" name="input" placeholder="Message" autocomplete="off" />
+      <div id="the-count">
+        <span id="current">0</span>
+        <span id="maximum">/ 1000</span>
+      </div><button>Send</button>
     </form>
     <script src="/socket.io/socket.io.js"></script>
 <script>
-  //im not very smart but here is my set up
+  //im not very smart but here is my setup
   const socket = io();
   typing = []
   const rember = document.querySelector('#accept');
   let Username = window.localStorage.getItem('username');
   document.getElementById('id02').innerHTML = "Username: " + Username;
+  const list = document.getElementById("messages")
   const modal = document.getElementById("id01");
   const form = document.getElementById('form');
   const username = document.getElementById('userbox');
@@ -178,14 +187,19 @@ hr {
       document.getElementById('id01').style.display='block';
     }else{
     if (input.value) {
+      if(input.value.length < 1000){
       socket.emit('chat message', input.value, Username);
       socket.emit('not typing', username);
-      var item = document.createElement('li');
-    item.textContent = Username + ": " + input.value;
-    messages.appendChild(item);
+      document.getElementById('current').innerHTML = 0
+      let item = "How did you send this?"
+    item = '<li>' + Username + ": " + input.value; + '</li>'
+    list.insertAdjacentHTML('beforeend', item.toString());
     window.scrollTo(0, document.body.scrollHeight);
       input.value = '';
-    }}
+    } else {
+      alert('Please keep your message to a maximum of 1000 characters.');
+    }
+  }}
   });
 // Form validation
   function checkForm(form)
@@ -230,16 +244,16 @@ hr {
       name.innerHTML = "Username: " + Username;
     }}
   socket.on('chat message', function(msg, usr) {
-    var item = document.createElement('li');
-    item.textContent = usr + ": " + msg;
-    messages.appendChild(item);
+    let item = "How did you send this?"
+    item = '<li>' + usr + ": " + msg + '</li>';
+    list.insertAdjacentHTML('beforeend', item.toString());
     window.scrollTo(0, document.body.scrollHeight);
   });
 //ahhhhhhhhhhhhhhhhhhhhhhhhhhhh
   document.getElementById('input').onkeypress = function() {
     socket.emit("typing", Username);
   }
-  window.addEventListener('keydown', function (e) {
+  window.addEventListener('input', function (e) {
     if(e.key == "Backspace" || e.key == "Delete")
     socket.emit("not typing", Username);
   }, false);
@@ -259,6 +273,12 @@ hr {
       typingThing.style.display = 'block';
       typingThing.innerHTML = typing + " is typing";
     }
+  });
+  window.addEventListener('input', function() {
+    
+    var characterCount = input.value.length
+  
+    document.getElementById('current').innerHTML = characterCount;
   });
 </script>
   </body>
