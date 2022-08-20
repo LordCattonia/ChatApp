@@ -1,6 +1,7 @@
 # ChatApp
 ### A really bad project
 This is my first big project. I am using JS, CSS and HTML<br>
+Run buy Node.JS<br>
 Libraries for JS: Socket.IO and Express.
 ### Setup/Install
 Step 1. Download and unzip by using the GUI or ```git clone https://github.com/LordCattonia/ChatApp.git```<br>
