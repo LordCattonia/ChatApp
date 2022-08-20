@@ -31,21 +31,6 @@ input[type=text]:focus, input[type=password]:focus {
   outline: none;
 }
 
-/* Set a style for all buttons */
-.button1 {
-  background-color: #04AA6D;
-  color: white;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-  opacity: 0.9;
-}
-
-.button1:hover {
-  opacity:1;
-}
 
 /* Extra styles for the cancel button */
 .cancelbtn {
@@ -111,9 +96,6 @@ hr {
 
 /* Change styles for cancel button and signup button on extra small screens */
 @media screen and (max-width: 401px) {
-  .cancelbtn, .signupbtn {
-    width: 100%;
-  }
   .modal-content{
     width: 60%;
   }
@@ -129,6 +111,7 @@ hr {
       <button onclick="document.getElementById('id01').style.display='block'" id="userbtn">Change Username</button>
     </div>
   </header>
+  <!-- Enter username Modal -->
     <div id="id01" class="modal">
       <form class="modal-content" method="dialog" onsubmit="return checkForm(this);">
         <div class="container">
@@ -162,7 +145,7 @@ hr {
     </form>
     <script src="/socket.io/socket.io.js"></script>
 <script>
-  //im not very smart but here is my setup
+  // I am not very smart but here is my setup
   const socket = io();
   typing = []
   const rember = document.querySelector('#accept');
@@ -175,34 +158,80 @@ hr {
   const rememberMe = document.getElementsByName('remember');
   const input = document.getElementById('input');
   const name = document.getElementById('id02');
-  const typingThing = document.getElementById('typing');
-
+  const typingBox = document.getElementById('typing');
   if (window.localStorage.getItem('username') === null || (window.localStorage.getItem('username')) === ""){
     document.getElementById('id02').innerHTML = 'No Username';
   }
 
+// The script sends messages
   form.addEventListener('submit', function(e) {
     e.preventDefault();
     if (Username === null || Username === ""){
       document.getElementById('id01').style.display='block';
     }else{
     if (input.value) {
-      if(input.value.length < 1000){
-      socket.emit('chat message', input.value, Username);
-      socket.emit('not typing', username);
-      document.getElementById('current').innerHTML = 0
-      let item = "How did you send this?"
-    item = '<li>' + Username + ": " + input.value; + '</li>'
-    list.insertAdjacentHTML('beforeend', item.toString());
-    window.scrollTo(0, document.body.scrollHeight);
-      input.value = '';
+      // Lenght validation
+      if(input.value.length < 1001){
+        let count = (input.value.match(/br>/g) || []).length;
+        console.log(count)
+        if(count < 19) {
+          socket.emit('chat message', input.value, Username);
+          socket.emit('not typing', username);
+          document.getElementById('current').innerHTML = 0
+         let item = "How did you send this?"
+          item = `<li>${Username}: ${input.value}</li>`
+          list.insertAdjacentHTML('beforeend', item.toString());
+          window.scrollTo(0, document.body.scrollHeight);
+          input.value = '';
+      } else {
+        alert("Too many '<br>'s will fill up the screens for everyone else :( \nBut you knew that already didn't you?")
+      }
+
     } else {
       alert('Please keep your message to a maximum of 1000 characters.');
     }
   }}
   });
+// This script recieves messages
+  socket.on('chat message', function(msg, usr) {
+    let item = "How did you send this?"
+    item = `<li>${Username}: ${input.value}</li>`
+    list.insertAdjacentHTML('beforeend', item.toString());
+    window.scrollTo(0, document.body.scrollHeight);
+  });
+
+// isTyping management
+  document.getElementById('input').onkeypress = function() {
+    socket.emit("typing", Username);
+  }
+  window.addEventListener('input', function (e) {
+    if(e.key == "Backspace" || e.key == "Delete")
+    socket.emit("not typing", Username);
+  }, false);
+
+
+  socket.on("not typing", usr => {
+    typing = typing.filter(function (f) {return f !== usr});
+    if(typing.length > 0) {
+      typingBox.innerHTML = typing + " is typing";
+    } else {
+      typingBox.style.display = 'none';
+    }
+  });
+  socket.on("typing", usr => {
+    if(typing.includes(usr)){
+      void(0);
+    } else {
+      typing.push(usr);
+      typingBox.style.display = 'block';
+      typingBox.innerHTML = typing + " is typing";
+    }
+  });
+
+
+
 // Form validation
-  function checkForm(form)
+function checkForm(form)
   {
     // validation fails if the input is blank
     if(form.userbox.value == "") {
@@ -232,48 +261,21 @@ hr {
     SetUsername();
     return true;
   }
-
-  function SetUsername() {
+   // This function sets username when you submit the modal
+   function SetUsername() {
     window.localStorage.removeItem('username');
     if (rember.checked == true){
       window.localStorage.setItem('username', username.value);
         Username = window.localStorage.getItem('username');
         name.innerHTML = "Username: " + Username;
+        console.log('username: ' + Username)
     } else{
       Username = username.value;
       name.innerHTML = "Username: " + Username;
+      console.log('username: ' + Username)
     }}
-  socket.on('chat message', function(msg, usr) {
-    let item = "How did you send this?"
-    item = '<li>' + usr + ": " + msg + '</li>';
-    list.insertAdjacentHTML('beforeend', item.toString());
-    window.scrollTo(0, document.body.scrollHeight);
-  });
-//ahhhhhhhhhhhhhhhhhhhhhhhhhhhh
-  document.getElementById('input').onkeypress = function() {
-    socket.emit("typing", Username);
-  }
-  window.addEventListener('input', function (e) {
-    if(e.key == "Backspace" || e.key == "Delete")
-    socket.emit("not typing", Username);
-  }, false);
-  socket.on("not typing", usr => {
-    typing = typing.filter(function (f) {return f !== usr});
-    if(typing.length > 0) {
-      typingThing.innerHTML = typing + " is typing";
-    } else {
-      typingThing.style.display = 'none';
-    }
-  });
-  socket.on("typing", usr => {
-    if(typing.includes(usr)){
-      void(0);
-    } else {
-      typing.push(usr);
-      typingThing.style.display = 'block';
-      typingThing.innerHTML = typing + " is typing";
-    }
-  });
+
+// Character count
   window.addEventListener('input', function() {
     
     var characterCount = input.value.length
