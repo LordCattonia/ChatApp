@@ -238,13 +238,27 @@
       const input = document.getElementById("input");
       const name = document.getElementById("id02");
       const typingBox = document.getElementById("typing");
+      let token
       if (
         window.localStorage.getItem("username") === null ||
         window.localStorage.getItem("username") === ""
       ) {
         document.getElementById("id02").innerHTML = "No Username";
       }
-
+      // Handle tokens
+      socket.on("connect", () =>{
+        console.warn("socket connected");
+        socket.emit("token", {token: localStorage.getItem("token")});
+      });
+      socket.on("token", (data) =>{
+        console.warn("Client Token: " + data.token)
+        localStorage.setItem("token", data.token)
+        token = data.token
+      });
+      let resetToken = () => {
+        localStorage.removeItem("token")
+        window.location.reload()
+      }
       // The script sends messages
       form.addEventListener("submit", function (e) {
         e.preventDefault();
@@ -298,7 +312,7 @@
         },
         false
       );
-
+      
       socket.on("not typing", (usr) => {
         typing = typing.filter(function (f) {
           return f !== usr;

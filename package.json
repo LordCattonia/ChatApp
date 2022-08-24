@@ -4,6 +4,7 @@
     "description": "idk what the hell im doing",
     "dependencies": {
         "express": "^4.18.1",
-        "socket.io": "^4.5.1"
+        "socket.io": "^4.5.1",
+        "uuid": "^8.3.2"
     }
 }
