@@ -239,6 +239,7 @@
       const name = document.getElementById("id02");
       const typingBox = document.getElementById("typing");
       let token
+      let onlineUsers = {}
       if (
         window.localStorage.getItem("username") === null ||
         window.localStorage.getItem("username") === ""
@@ -254,6 +255,7 @@
         console.warn("Client Token: " + data.token)
         localStorage.setItem("token", data.token)
         token = data.token
+        socket.emit("Username", token, Username)
       });
       let resetToken = () => {
         localStorage.removeItem("token")
@@ -271,12 +273,15 @@
               let count = (input.value.match(/br>/g) || []).length;
               console.log(count);
               if (count < 19) {
-                socket.emit("chat message", input.value, Username);
+                socket.emit("chat message", input.value, token);
                 socket.emit("not typing", username);
                 document.getElementById("current").innerHTML = 0;
-                let item = "How did you send this?";
-                item = `<li>${Username}: ${input.value}</li>`;
-                list.insertAdjacentHTML("beforeend", item.toString());
+                let msg = input.value
+                socket.emit("requestID", (id) => {
+                  let item = "How did you send this?";
+                  item = `<li id="msg${id}">${onlineUsers[token]}: ${msg}</li>`;
+                  list.insertAdjacentHTML("beforeend", item.toString());
+                });
                 window.scrollTo(0, document.body.scrollHeight);
                 input.value = "";
               } else {
@@ -293,10 +298,10 @@
         }
       });
       // This script recieves messages
-      socket.on("chat message", function (msg, usr) {
+      socket.on("chat message", function (msg, usr, id) {
         let item = "How did you send this?";
-        item = `<li>${Username}: ${input.value}</li>`;
-        list.insertAdjacentHTML("beforeend", item.toString());
+        item = `<li id="msg${id}">${onlineUsers[usr]}: ${msg}</li>`;
+        list.insertAdjacentHTML("beforeend", msg);
         window.scrollTo(0, document.body.scrollHeight);
       });
 
@@ -363,6 +368,8 @@
         SetUsername();
         return true;
       }
+
+      
       // This function sets username when you submit the modal
       function SetUsername() {
         window.localStorage.removeItem("username");
@@ -371,10 +378,12 @@
           Username = window.localStorage.getItem("username");
           name.innerHTML = "Username: " + Username;
           console.log("username: " + Username);
+          socket.emit("Username", token, Username)
         } else {
           Username = username.value;
           name.innerHTML = "Username: " + Username;
           console.log("username: " + Username);
+          socket.emit("Username", token, Username)
         }
       }
 
@@ -384,6 +393,15 @@
 
         document.getElementById("current").innerHTML = characterCount;
       });
+
+      // Online users
+      function requestOnline() {
+        socket.emit("onlineRequest");
+      }
+      setInterval(requestOnline, 1000);
+      socket.on("online", (OnlineUsers) => {
+        onlineUsers = OnlineUsers
+      })
     </script>
   </body>
 </html>

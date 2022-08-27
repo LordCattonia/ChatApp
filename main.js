@@ -8,6 +8,8 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 const uuid = require("uuid");
 let timeOut;
+let onlineUsers = {};
+let id = 0;
 
 // Send index.html to client
 app.get("/", (req, res) => {
@@ -27,14 +29,31 @@ io.on("connection", (socket) => {
     socket.emit("token", {token: data.token && uuid.validate(data.token) && uuid.version(data.token) === 4 ? data.token : uuid.v4()})
   })
 
+  // Handles Username + UUID Pairs
+  socket.on("Username", (token, Username) => {
+    onlineUsers[token] = Username
+  });
+  socket.on("onlineRequest", () => {
+    socket.emit("online", onlineUsers)
+  })
+
   // Handle chat messages
   socket.on("chat message", (msg, usr) => {
     console.log(usr, "says: " + msg);
   });
-    socket.on("chat message", (msg, usr) => {
-    socket.broadcast.emit("chat message", msg, usr);
+    // Id management for the client that send the message
+    // This has to be before the main id part or else the id will increase before it is received.
+  socket.on("requestID", (callback) =>{
+    callback(id.toString().padStart(3, "0"))
+    id += 1
+  })
+  socket.on("chat message", (msg, token) => {
+    let idmessage = id.toString().padStart(3, "0")
+    socket.broadcast.emit("chat message", msg, token, idmessage);
   });
-  
+
+
+
   // Typing management
   socket.on("typing", (usr) => {
     if (usr != null) {
