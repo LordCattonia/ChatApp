@@ -12,10 +12,8 @@ let timeOut;
 let onlineUsers = {};
 let id = 0;
 
-// Send index.html to client
-app.get("/", (req, res) => {
-	res.sendFile(__dirname + "/index.html");
-});
+// Send public folder to client
+app.use(express.static('public'))
 
 
 io.on("connection", (socket) => {
@@ -40,7 +38,6 @@ io.on("connection", (socket) => {
 
 	// Handle chat messages
 	socket.on("chat message", (msg, usr) => {
-		console.log(purifyHTML(msg));
 		console.log(usr, "says: " + msg);
 	});
 	// Id management for the client that send the message
@@ -73,15 +70,6 @@ io.on("connection", (socket) => {
 		socket.broadcast.emit("not typing", usr);
 	});
 });
-
-async function purifyHTML(msg) {
-	let message = "data: " + msg
-	let response = await fetch('http://localhost:3000/purify.php',{
-		method: 'POST',
-		body: message
-	});
-return await response.text();
-}
 
 //makes sure it is connected
 server.listen(3000, () => {
