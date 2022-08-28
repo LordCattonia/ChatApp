@@ -113,7 +113,7 @@ input[type="password"]:focus {
 /* The Modal (background) */
 .modal {
   display: none;
-  /* Fuck. It reloads the page */
+  /* Hide on first load */
   position: fixed;
   /* Stay in place */
   z-index: 1;
@@ -126,7 +126,8 @@ input[type="password"]:focus {
   /* Full height */
   overflow: auto;
   /* Enable scroll if needed */
-  background-color: #474e5d;
+  background-color: transparent;
+  /* To make it invisible*/
   padding-top: 50px;
 }
 
@@ -159,40 +160,6 @@ hr {
   content: "";
   clear: both;
   display: table;
-}
-
-.tooltip {
-  position: relative;
-  display: inline-block;
-  border-bottom: 1px dotted black;
-}
-
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: 120px;
-  background-color: black;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
-  position: absolute;
-  z-index: 1;
-  top: -5px;
-  right: 110%;
-}
-
-.tooltip .tooltiptext::after {
-  content: " ";
-  position: absolute;
-  top: 50%; /* At the bottom of the tooltip */
-  left: 100%;
-  margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: black transparent transparent transparent;
-}
-.tooltip:hover .tooltiptext {
-  visibility: visible;
 }
 
 /* Change styles for cancel button and signup button on extra small screens */
