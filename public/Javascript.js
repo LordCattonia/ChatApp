@@ -10,10 +10,11 @@
       const username = document.getElementById("userbox");
       const rememberMe = document.getElementsByName("remember");
       const input = document.getElementById("input");
-      const name = document.getElementById("id02");
+      const nameDisplay = document.getElementById("id02");
       const typingBox = document.getElementById("typing");
       let token
       let onlineUsers = {}
+      let msgHistory = {}
       if (
         window.localStorage.getItem("username") === null ||
         window.localStorage.getItem("username") === ""
@@ -24,6 +25,8 @@
       socket.on("connect", () =>{
         console.warn("socket connected");
         socket.emit("token", {token: localStorage.getItem("token")});
+        requestMessageHistory();
+        applyMessageHistory();
       });
       socket.on("token", (data) =>{
         console.warn("Client Token: " + data.token)
@@ -34,6 +37,23 @@
       let resetToken = () => {
         localStorage.removeItem("token")
         window.location.reload()
+      }
+      function requestMessageHistory(){
+        socket.emit("requestMessageHistory", (history) => {
+            msgHistory = history;
+        })
+      }
+      function applyMessageHistory(){
+        socket.emit("peekID", (id) => {
+            if(id > 0){
+                Object.keys(msgHistory).forEach(key => {
+                    let item = "How did you send this?";
+                    item = `<li id="msg${key}">${msgHistory[key][0]}: ${msgHistory[key][1]}</li>`;
+                    list.insertAdjacentHTML("beforeend", item.toString());
+                    window.scrollTo(0, document.body.scrollHeight);
+                })
+            }
+        })
       }
       // The script sends messages
       form.addEventListener("submit", function (e) {
@@ -150,12 +170,12 @@
         if (rember.checked == true) {
           window.localStorage.setItem("username", username.value);
           Username = window.localStorage.getItem("username");
-          name.innerHTML = "Username: " + Username;
+          nameDisplay.innerHTML = "Username: " + Username;
           console.log("username: " + Username);
           socket.emit("Username", token, Username)
         } else {
           Username = username.value;
-          name.innerHTML = "Username: " + Username;
+          nameDisplay.innerHTML = "Username: " + Username;
           console.log("username: " + Username);
           socket.emit("Username", token, Username)
         }

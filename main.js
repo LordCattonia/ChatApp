@@ -1,7 +1,7 @@
 //set up server and Socket.io
 const { Socket } = require("dgram");
 const express = require("express");
-const fetch = require("node-fetch")
+const fs = require("fs");
 const app = express();
 const http = require("http");
 const server = http.createServer(app);
@@ -11,12 +11,15 @@ const uuid = require("uuid");
 let timeOut;
 let onlineUsers = {};
 let id = 0;
+let msgHistory = {};
 
 // Send public folder to client
+
+
 app.use(express.static('public'))
 
-
 io.on("connection", (socket) => {
+
 	// Handle connections and disconnections
 	console.log(socket.id + " connected");
 	socket.on("disconnect", () => {
@@ -46,12 +49,18 @@ io.on("connection", (socket) => {
 		callback(id.toString().padStart(3, "0"))
 		id += 1
 	})
+	socket.on("peekID", (callback) => {
+		callback(id)
+	})
 	socket.on("chat message", (msg, token) => {
-		let idmessage = id.toString().padStart(3, "0")
+		let idmessage = id.toString().padStart(3, "0");
+		msgHistory[idmessage] = [onlineUsers[token], msg, token];
 		socket.broadcast.emit("chat message", msg, token, idmessage);
 	});
 
-
+	socket.on("requestMessageHistory", (callback) => {
+		callback(msgHistory)
+	})
 
 	// Typing management
 	socket.on("typing", (usr) => {
