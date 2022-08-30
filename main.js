@@ -54,7 +54,7 @@ io.on("connection", (socket) => {
 	})
 	socket.on("chat message", (msg, token) => {
 		let idmessage = id.toString().padStart(3, "0");
-		msgHistory[idmessage] = [onlineUsers[token], msg, token];
+		msgHistory[idmessage] = [onlineUsers[token], msg];
 		socket.broadcast.emit("chat message", msg, token, idmessage);
 	});
 
