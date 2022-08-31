@@ -1,12 +1,16 @@
 {
-    "name": "socket-chat",
-    "version": "0.0.1",
-    "description": "idk what the hell im doing",
-    "dependencies": {
-        "express": "^4.18.1",
-        "fs": "^0.0.1-security",
-        "node-fetch": "^2.6.2",
-        "socket.io": "^4.5.1",
-        "uuid": "^8.3.2"
-    }
+  "name": "socket-chat",
+  "version": "1.0.0",
+  "description": "idk what the hell im doing",
+  "dependencies": {
+    "express": "^4.18.1",
+    "socket.io": "^4.5.1",
+    "uuid": "^8.3.2"
+  },
+  "main": "main.js",
+  "author": "LordCattonia",
+  "contributors": [
+    "J4C0B3Y"
+  ],
+  "license": "ISC"
 }
