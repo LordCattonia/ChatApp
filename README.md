@@ -12,7 +12,7 @@ Made using: [Node.js](https://nodejs.org/en/download/), [Express](https://www.np
 
 - Step 3. Open your terminal and run `node .`
 
-- Step 4. Head to [localhost:3000](http://localhost:3000) on your browser.
+- Step 4. Head to [localhost:3000](http://localhost:3000) in your browser.
 ***
 ### Other
 Please report any bugs in [issues](https://github.com/LordCattonia/ChatApp/issues).
