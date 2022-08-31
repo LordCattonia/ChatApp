@@ -14,7 +14,7 @@
       const typingBox = document.getElementById("typing");
       let token
       let onlineUsers = {}
-      let msgHistory = {}
+      let msgHistory = []
       if (
         window.localStorage.getItem("username") === null ||
         window.localStorage.getItem("username") === ""
@@ -46,9 +46,11 @@
       function applyMessageHistory(){
         socket.emit("peekID", (id) => {
             if(id > 0){
-                Object.keys(msgHistory).forEach(key => {
+                let i = 0;
+                msgHistory.forEach((object) => {
                     let item = "How did you send this?";
-                    item = `<li id="msg${key}">${msgHistory[key][0]}: ${msgHistory[key][1]}</li>`;
+                    item = `<li id="msg${i}">${object.name}: ${object.message}</li>`;
+                    i++
                     list.insertAdjacentHTML("beforeend", item.toString());
                     window.scrollTo(0, document.body.scrollHeight);
                 })
@@ -68,7 +70,7 @@
               console.log(count);
               if (count < 19) {
                 socket.emit("chat message", input.value, token);
-                socket.emit("not typing", username);
+                socket.emit("not typing", Username);
                 document.getElementById("current").innerHTML = 0;
                 let msg = input.value
                 socket.emit("requestID", (id) => {

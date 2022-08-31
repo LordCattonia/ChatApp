@@ -11,7 +11,7 @@ const uuid = require("uuid");
 let timeOut;
 let onlineUsers = {};
 let id = 0;
-let msgHistory = {};
+let msgHistory = [];
 
 // Send public folder to client
 
@@ -46,15 +46,15 @@ io.on("connection", (socket) => {
 	// Id management for the client that send the message
 	// This has to be before the main id part or else the id will increase before it is received.
 	socket.on("requestID", (callback) => {
-		callback(id.toString().padStart(3, "0"))
+		callback(id)
 		id += 1
 	})
 	socket.on("peekID", (callback) => {
 		callback(id)
 	})
 	socket.on("chat message", (msg, token) => {
-		let idmessage = id.toString().padStart(3, "0");
-		msgHistory[idmessage] = [onlineUsers[token], msg];
+		let idmessage = id
+		msgHistory.push({name:onlineUsers[token], message:msg});
 		socket.broadcast.emit("chat message", msg, token, idmessage);
 	});
 
