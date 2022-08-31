@@ -37,10 +37,6 @@ io.on("connection", (socket) => {
 		onlineUsers[token] = Username
 	})
 
-	socket.on("onlineRequest", () => {
-		socket.emit("online", onlineUsers)
-	})
-
 	// Handle chat messages
 	socket.on("chat message", (msg, usr) => {
 		console.log(usr, "says: " + msg)

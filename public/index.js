@@ -12,15 +12,13 @@ const rememberMe = document.getElementsByName("remember")
 const input = document.getElementById("input")
 const nameDisplay = document.getElementById("id02")
 const typingBox = document.getElementById("typing")
+const current = document.getElementById("current")
+
 let token
-let onlineUsers = {}
 let msgHistory = []
-if (
-	window.localStorage.getItem("username") === null ||
-	window.localStorage.getItem("username") === ""
-) {
-	document.getElementById("id02").innerHTML = "No Username"
-}
+
+if (!window.localStorage.getItem("username")) document.getElementById("id02").innerHTML = "No Username"
+
 // Handle tokens
 socket.on("connect", () => {
 	console.warn("socket connected")
@@ -30,12 +28,14 @@ socket.on("connect", () => {
 	requestMessageHistory()
 	applyMessageHistory()
 })
+
 socket.on("token", (data) => {
-	console.warn("Client Token: " + data.token)
+	console.log(`Client Token: ${data.token}`)
 	localStorage.setItem("token", data.token)
 	token = data.token
 	socket.emit("Username", token, Username)
 })
+
 let resetToken = () => {
 	localStorage.removeItem("token")
 	window.location.reload()
@@ -165,13 +165,13 @@ function checkForm(form) {
 	// validation was successful
 
 	document.getElementById("id01").style.display = "none"
-	SetUsername()
+	setUsername()
 	return true
 }
 
 
 // This function sets username when you submit the modal
-function SetUsername() {
+function setUsername() {
 	window.localStorage.removeItem("username")
 	if (rember.checked == true) {
 		window.localStorage.setItem("username", username.value)
@@ -188,17 +188,6 @@ function SetUsername() {
 }
 
 // Character count
-window.addEventListener("input", function() {
-	var characterCount = input.value.length
-
-	document.getElementById("current").innerHTML = characterCount
-})
-
-// Online users
-function requestOnline() {
-	socket.emit("onlineRequest")
-}
-setInterval(requestOnline, 1000)
-socket.on("online", (OnlineUsers) => {
-	onlineUsers = OnlineUsers
+input.addEventListener("input", () => {
+	current.innerHTML = input.value.length
 })
