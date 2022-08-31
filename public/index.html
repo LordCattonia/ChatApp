@@ -2,66 +2,65 @@
 <html>
 
 <head>
-  <title>Chat</title>
-  <link rel="stylesheet" href="style.css">
-
+	<title>Chat</title>
+	<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-  <header class="topBar">
-    <div class="Opposites">
-      <h1 style="display: inline-block" id="id02">Username:</h1>
-      <p>
-        This application allows HTML and CSS styling for your messages. Click
-        <a href="https://google.github.io/styleguide/htmlcssguide.html">here</a>
-        for more info about this
-      </p>
-      <button onclick="document.getElementById('id01').style.display='block'" id="userbtn">
-        Change Username
-      </button>
-    </div>
-  </header>
-  <!-- Enter username Modal -->
-  <div id="id01" class="modal">
-    <form class="modal-content" method="dialog" onsubmit="return checkForm(this);">
-      <div class="container">
-        <h3>Sign up</h3>
-        <p>Please enter your username</p>
-        <hr />
+	<header class="topBar">
+		<div class="Opposites">
+			<h1 style="display: inline-block" id="id02">Username:</h1>
+			<p>
+				This application allows HTML and CSS styling for your messages. Click
+				<a href="https://google.github.io/styleguide/htmlcssguide.html">here</a>
+				for more info about this
+			</p>
+			<button onclick="document.getElementById('id01').style.display='block'" id="userbtn">
+				Change Username
+			</button>
+		</div>
+	</header>
+	<!-- Enter username Modal -->
+	<div id="id01" class="modal">
+		<form class="modal-content" method="dialog" onsubmit="return checkForm(this);">
+			<div class="container">
+				<h3>Sign up</h3>
+				<p>Please enter your username</p>
+				<hr />
 
-        <label id="Usrnm"><b>Username</b></label>
-        <input placeholder="Enter username" name="userbox" id="userbox" />
-        <br />
-        <label>
-          <input type="checkbox" id="accept" style="margin-bottom: 15px" />
-          Remember me
-        </label>
+				<label id="Usrnm"><b>Username</b></label>
+				<input placeholder="Enter username" name="userbox" id="userbox" />
+				<br />
+				<label>
+					<input type="checkbox" id="accept" style="margin-bottom: 15px" />
+					Remember me
+				</label>
 
-        <p>
-          By joining you agree to our
-          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" style="color: dodgerblue">Terms & Privacy</a>.
-        </p>
+				<p>
+					By joining you agree to our
+					<a href="https://youtube.com/watch?v=dQw4w9WgXcQ" style="color: dodgerblue">Terms & Privacy</a>.
+				</p>
 
-        <div class="clearfix">
-          <button type="button1" class="cancelbtn">Sign Up</button>
-        </div>
-      </div>
-    </form>
-  </div>
-  <ul id="messages"></ul>
-  <p id="typing" style="display: none">
-    If you see this something has gone horribly wrong
-  </p>
-  <form id="form" action="">
-    <input id="input" name="input" placeholder="Message" autocomplete="off" />
-    <div id="the-count">
-      <span id="current">0</span>
-      <span id="maximum">/ 1000</span>
-    </div>
-    <button>Send</button>
-  </form>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="Javascript.js"></script>
+				<div class="clearfix">
+					<button type="button1" class="cancelbtn">Sign Up</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<ul id="messages"></ul>
+	<p id="typing" style="display: none">
+		If you see this something has gone horribly wrong
+	</p>
+	<form id="form" action="">
+		<input id="input" name="input" placeholder="Message" autocomplete="off" />
+		<div id="the-count">
+			<span id="current">0</span>
+			<span id="maximum">/ 1000</span>
+		</div>
+		<button>Send</button>
+	</form>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="Javascript.js"></script>
 </body>
 
 </html>
