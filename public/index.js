@@ -79,7 +79,7 @@ form.addEventListener("submit", function(e) {
 					let msg = input.value
 					socket.emit("requestID", (id) => {
 						let item = "How did you send this?"
-						item = `<li id="msg${id}">${onlineUsers[token]}: ${msg}</li>`
+						item = `<li id="msg${id}">${Username}: ${msg}</li>`
 						list.insertAdjacentHTML("beforeend", item.toString())
 					})
 					window.scrollTo(0, document.body.scrollHeight)
@@ -100,7 +100,7 @@ form.addEventListener("submit", function(e) {
 // This script recieves messages
 socket.on("chat message", function(msg, usr, id) {
 	let item = "How did you send this?"
-	item = `<li id="msg${id}">${onlineUsers[usr]}: ${msg}</li>`
+	item = `<li id="msg${id}">${usr}: ${msg}</li>`
 	list.insertAdjacentHTML("beforeend", msg)
 	window.scrollTo(0, document.body.scrollHeight)
 })

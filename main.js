@@ -56,7 +56,7 @@ io.on("connection", (socket) => {
 	socket.on("chat message", (msg, token) => {
 		let idmessage = id
 		msgHistory.push({name:onlineUsers[token], message:msg})
-		socket.broadcast.emit("chat message", msg, token, idmessage)
+		socket.broadcast.emit("chat message", msg, onlineUsers[token], idmessage)
 	})
 
 	socket.on("requestMessageHistory", (callback) => {
