@@ -63,22 +63,22 @@ io.on("connection", (socket) => {
 		callback(msgHistory)
 	})
 
-	// Typing management
-	socket.on("typing", (usr) => {
-		if (usr != null) {
-			console.log(usr, "is typing")
-			socket.broadcast.emit("typing", usr)
+	// Typing
+	socket.on("typing", (data) => {
+		if (!data.user) return
+
+		if (data.typing) {
+			console.log(data.user, "is typing")
+			socket.broadcast.emit("typing", {user: data.user, typing: true})
 			clearTimeout(timeOut)
 			timeOut = setTimeout(function () {
-				console.log(usr, "stopped typing")
-				socket.broadcast.emit("not typing", usr)
+				console.log(data.user, "stopped typing")
+				socket.broadcast.emit("typing", {user: data.user, typing: false})
 			}, 1000)
+		} else {
+			console.log(user, "stopped typing")
+			socket.broadcast.emit("typing", {user: data.user, typing: false})
 		}
-	})
-
-	socket.on("not typing", (usr) => {
-		console.log(usr, "stopped typing")
-		socket.broadcast.emit("not typing", usr)
 	})
 })
 
