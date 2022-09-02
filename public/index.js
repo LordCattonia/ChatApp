@@ -105,36 +105,31 @@ socket.on("chat message", function(msg, usr, id) {
 	window.scrollTo(0, document.body.scrollHeight)
 })
 
-// isTyping management
-document.getElementById("input").onkeypress = function() {
-	socket.emit("typing", Username)
-}
-window.addEventListener(
-	"input",
-	function(e) {
-		if (e.key == "Backspace" || e.key == "Delete")
-			socket.emit("not typing", Username)
-	},
-	false
-)
-
-socket.on("not typing", (usr) => {
-	typing = typing.filter(function(f) {
-		return f !== usr
-	})
-	if (typing.length > 0) {
-		typingBox.innerHTML = typing + " is typing"
-	} else {
-		typingBox.style.display = "none"
-	}
+// Typing
+document.getElementById("input").addEventListener("keydown", () => {
+	socket.emit("typing", {user: Username, typing: true})
 })
-socket.on("typing", (usr) => {
-	if (typing.includes(usr)) {
-		void 0
-	} else {
-		typing.push(usr)
+
+window.addEventListener("input", (event) => {
+	if(event.key != "Backspace" && event.key != "Delete") return
+
+	socket.emit("typing", {user: Username, typing: true})		
+})
+
+socket.on("typing", (data) => {
+	if (!data.user) return
+
+	if (data.typing) {
+		console.log("typing")
+		if (typing.includes(data.user)) return
+
+		typing.push(data.user)
 		typingBox.style.display = "block"
 		typingBox.innerHTML = typing + " is typing"
+		
+	} else {
+		typing = typing.filter(user => user !== data.user)
+		typing.length ? typingBox.innerHTML = typing + " is typing" : typingBox.style.display = "none"
 	}
 })
 
