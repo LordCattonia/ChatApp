@@ -62,7 +62,7 @@ let applyMessageHistory = () => {
 	})
 }
 // The script sends messages
-form.addEventListener("submit", (e) {
+form.addEventListener("submit", (e) => {
 	e.preventDefault()
 	if (Username === null || Username === "") {
 		document.getElementById("id01").style.display = "block"
@@ -98,7 +98,7 @@ form.addEventListener("submit", (e) {
 	}
 })
 // This script recieves messages
-socket.on("chat message", (msg, usr, id) {
+socket.on("chat message", (msg, usr, id) => {
 	let item = "How did you send this?"
 	item = `<li id="msg${id}">${usr}: ${msg}</li>`
 	list.insertAdjacentHTML("beforeend", msg)
@@ -134,7 +134,7 @@ socket.on("typing", (data) => {
 })
 
 // Form validation
-function checkForm(form) {
+let checkForm = (form) => {
 	// validation fails if the input is blank
 	if (form.userbox.value == "") {
 		alert("Error: Input is empty!")
