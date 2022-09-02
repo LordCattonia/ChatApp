@@ -1,6 +1,5 @@
 // I am not very smart but here is my setup
 const socket = io()
-typing = []
 const rember = document.querySelector("#accept")
 let Username = window.localStorage.getItem("username")
 document.getElementById("id02").innerHTML = "Username: " + Username
@@ -15,6 +14,7 @@ const typingBox = document.getElementById("typing")
 const current = document.getElementById("current")
 
 let token
+let typing = []
 let msgHistory = []
 
 if (!window.localStorage.getItem("username")) document.getElementById("id02").innerHTML = "No Username"
@@ -41,13 +41,13 @@ let resetToken = () => {
 	window.location.reload()
 }
 
-function requestMessageHistory() {
+let requestMessageHistory = () => {
 	socket.emit("requestMessageHistory", (history) => {
 		msgHistory = history
 	})
 }
 
-function applyMessageHistory() {
+let applyMessageHistory = () => {
 	socket.emit("peekID", (id) => {
 		if (id > 0) {
 			let i = 0
@@ -62,7 +62,7 @@ function applyMessageHistory() {
 	})
 }
 // The script sends messages
-form.addEventListener("submit", function(e) {
+form.addEventListener("submit", (e) {
 	e.preventDefault()
 	if (Username === null || Username === "") {
 		document.getElementById("id01").style.display = "block"
@@ -98,7 +98,7 @@ form.addEventListener("submit", function(e) {
 	}
 })
 // This script recieves messages
-socket.on("chat message", function(msg, usr, id) {
+socket.on("chat message", (msg, usr, id) {
 	let item = "How did you send this?"
 	item = `<li id="msg${id}">${usr}: ${msg}</li>`
 	list.insertAdjacentHTML("beforeend", msg)
@@ -166,7 +166,7 @@ function checkForm(form) {
 
 
 // This function sets username when you submit the modal
-function setUsername() {
+let setUsername = () => {
 	window.localStorage.removeItem("username")
 	if (rember.checked == true) {
 		window.localStorage.setItem("username", username.value)
