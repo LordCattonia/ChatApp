@@ -9,7 +9,7 @@ const io = new Server(server)
 const uuid = require("uuid")
 
 let timeOut
-let onlineUsers = {}
+let onlineUsers = []
 let id = 0
 let msgHistory = []
 
