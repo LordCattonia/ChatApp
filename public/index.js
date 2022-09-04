@@ -21,7 +21,7 @@ if (!window.localStorage.getItem("username")) document.getElementById("id02").in
 
 // Handle tokens
 socket.on("connect", () => {
-	console.warn("socket connected")
+	console.log("socket connected")
 	socket.emit("token", {
 		token: localStorage.getItem("token")
 	})

@@ -34,7 +34,7 @@ io.on("connection", (socket) => {
 
 	// Handles Username + UUID Pairs
 	socket.on("Username", (token, Username) => {
-		onlineUsers[token] = Username
+		onlineUsers.find(x => x.uuid === token).name = Username
 	})
 
 	// Handle chat messages
@@ -55,8 +55,8 @@ io.on("connection", (socket) => {
 
 	socket.on("chat message", (msg, token) => {
 		let idmessage = id
-		msgHistory.push({name:onlineUsers[token], message:msg})
-		socket.broadcast.emit("chat message", msg, onlineUsers[token], idmessage)
+		msgHistory.push({name:onlineUsers.find(x => x.uuid === token).name, message:msg})
+		socket.broadcast.emit("chat message", msg, onlineUsers.find(x => x.uuid === token).name, idmessage)
 	})
 
 	socket.on("requestMessageHistory", (callback) => {
