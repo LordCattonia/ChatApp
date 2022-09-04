@@ -34,7 +34,7 @@ io.on("connection", (socket) => {
 
 	// Handles Username + UUID Pairs
 	socket.on("Username", (token, Username) => {
-		onlineUsers.find(x => x.uuid === token).name = Username
+		onlineUsers.push({uuid:token, name:Username})
 	})
 
 	// Handle chat messages
