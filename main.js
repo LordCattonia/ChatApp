@@ -39,7 +39,7 @@ io.on("connection", (socket) => {
 
 	// Handle chat messages
 	socket.on("chat message", (msg, usr) => {
-		console.log(usr, "says: " + msg)
+		console.log(onlineUsers.find(x => x.uuid === token).name, "says: " + msg)
 	})
 
 	// Id management for the client that send the message
