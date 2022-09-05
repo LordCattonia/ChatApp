@@ -9,7 +9,8 @@ Made using: [Node.js](https://nodejs.org/en/download/), [Express](https://www.np
 
 ##### IMPORTANT:  
 
-If on Windows 10, install Windows Terminal from [here](https://apps.microsoft.com/store/detail/windows-terminal/9N0DX20HK701) beforehand.
+If on Windows 10, install Windows Terminal from [here](https://apps.microsoft.com/store/detail/windows-terminal/9N0DX20HK701) beforehand.  
+You then need to either restart your computer or go to Task Manager and `Restart` the Windows Explorer process
 
 ##### Other OSes:
 
