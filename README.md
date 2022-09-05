@@ -9,7 +9,7 @@ Made using: [Node.js](https://nodejs.org/en/download/), [Express](https://www.np
 
 ##### IMPORTANT:  
 
-If on Windows 10, install Windows Terminal from [here](apps.microsoft.com/store/detail/windows-terminal/9N0DX20HK701) beforehand.
+If on Windows 10, install Windows Terminal from [here](https://apps.microsoft.com/store/detail/windows-terminal/9N0DX20HK701) beforehand.
 
 ##### Other OSes:
 
