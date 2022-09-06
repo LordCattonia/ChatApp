@@ -38,29 +38,30 @@ io.on("connection", (socket) => {
 		} else {
 			onlineUsers.push({uuid: token, name: Username})
 		}
-		console.log(onlineUsers)
-	})
-
-	// Handle chat messages
-	socket.on("chat message", (msg, usr) => {
-		console.log(onlineUsers.find(x => x.uuid === usr).name, "says: " + msg)
-	})
-
-	// Id management for the client that send the message
-	// This has to be before the main id part or else the id will increase before it is received.
-	socket.on("requestID", (callback) => {
-		callback(id)
-		id += 1
 	})
 
 	socket.on("peekID", (callback) => {
 		callback(id)
 	})
 
+	// Handles Chat messages
 	socket.on("chat message", (msg, token) => {
-		let idmessage = id
-		msgHistory.push({name:onlineUsers.find(x => x.uuid === token).name, message: msg})
-		socket.broadcast.emit("chat message", msg, onlineUsers.find(x => x.uuid === token).name, idmessage)
+		if (msg.length < 1001) {
+			let count = (msg.match(/br>/g) || []).length
+			console.log(count)
+			if (count < 19) {
+				console.log(onlineUsers.find(x => x.uuid === token).name, "says: " + msg)
+				id += 1
+				let idmessage = id
+				msgHistory.push({name:onlineUsers.find(x => x.uuid === token).name, message: msg})
+				io.emit("chat message", msg, onlineUsers.find(x => x.uuid === token).name, idmessage)
+			} else {
+				socket.emit("error", {error: true, msg:"Too many '<br>'s will fill up the screens for everyone else :( \nBut you knew that already didn't you?"})
+			}
+		} else {
+			socket.emit("error", {error: true, msg: "Please keep your message to a maximum of 1000 characters."})
+		}
+
 	})
 
 	socket.on("requestMessageHistory", (callback) => {
