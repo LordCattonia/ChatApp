@@ -68,40 +68,21 @@ form.addEventListener("submit", (e) => {
 		document.getElementById("id01").style.display = "block"
 	} else {
 		if (input.value) {
-			// Lenght validation
-			if (input.value.length < 1001) {
-				let count = (input.value.match(/br>/g) || []).length
-				console.log(count)
-				if (count < 19) {
-					socket.emit("chat message", input.value, token)
-					socket.emit("not typing", Username)
-					document.getElementById("current").innerHTML = 0
-					let msg = input.value
-					socket.emit("requestID", (id) => {
-						let item = "How did you send this?"
-						item = `<li id="msg${id}">${Username}: ${msg}</li>`
-						list.insertAdjacentHTML("beforeend", item.toString())
-					})
-					window.scrollTo(0, document.body.scrollHeight)
-					input.value = ""
-				} else {
-					alert(
-						"Too many '<br>'s will fill up the screens for everyone else :( \nBut you knew that already didn't you?"
-					)
-				}
-			} else {
-				alert(
-					"Please keep your message to a maximum of 1000 characters."
-				)
-			}
+			socket.emit("chat message", input.value, token)
 		}
+	}
+})
+// This script recieves any errors and alerts the user
+socket.on("error", (data) => {
+	if(data.error){
+		alert(data.msg)
 	}
 })
 // This script recieves messages
 socket.on("chat message", (msg, usr, id) => {
 	let item = "How did you send this?"
 	item = `<li id="msg${id}">${usr}: ${msg}</li>`
-	list.insertAdjacentHTML("beforeend", msg)
+	list.insertAdjacentHTML("beforeend", item)
 	window.scrollTo(0, document.body.scrollHeight)
 })
 
