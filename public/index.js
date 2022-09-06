@@ -82,7 +82,7 @@ socket.on("error", (data) => {
 socket.on("chat message", (msg, usr, id) => {
 	let item = "How did you send this?"
 	item = `<li id="msg${id}">${usr}: ${msg}</li>`
-	list.insertAdjacentHTML("beforeend", msg)
+	list.insertAdjacentHTML("beforeend", item)
 	window.scrollTo(0, document.body.scrollHeight)
 })
 
