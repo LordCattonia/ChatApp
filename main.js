@@ -45,12 +45,12 @@ io.on("connection", (socket) => {
 
 	// Handles Chat messages
 	socket.on("chat message", (msg, token) => {
-		if (msg.length < 1001) {
-			let count = (msg.match(/br>/g) || []).length
+		if (msg.length <= 1000) {
+			let count = (msg.match(/br>/g)).length
 			console.log(count)
-			if (count < 19) {
+			if (count <= 20) {
 				console.log(onlineUsers.find(x => x.uuid === token).name, "says: " + msg)
-				id += 1
+				id++
 				let idmessage = id
 				msgHistory.push({name:onlineUsers.find(x => x.uuid === token).name, message: msg})
 				io.emit("chat message", msg, onlineUsers.find(x => x.uuid === token).name, idmessage)
