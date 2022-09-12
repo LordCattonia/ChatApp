@@ -46,7 +46,7 @@ io.on("connection", (socket) => {
 	// Handles Chat messages
 	socket.on("chat message", (msg, token) => {
 		if (msg.length <= 1000) {
-			let count = (msg.match(/br>/g)).length
+			let count = (msg.match(/br>/g) || []).length
 			console.log(count)
 			if (count <= 20) {
 				console.log(onlineUsers.find(x => x.uuid === token).name, "says: " + msg)
