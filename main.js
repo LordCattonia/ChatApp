@@ -7,6 +7,8 @@ const io = new Server(server)
 const uuid = require("uuid")
 
 let timeOut
+let noType = {}
+let cooldown = []
 let onlineUsers = []
 let id = 0
 let msgHistory = []
@@ -43,29 +45,60 @@ io.on("connection", (socket) => {
 		callback(id)
 	})
 
-	// Handles Chat messages
-	socket.on("chat message", (msg, token) => {
-		if (msg.length <= 1000) {
-			let count = (msg.match(/br>/g) || []).length
-			console.log(count)
-			if (count <= 20) {
-				console.log(onlineUsers.find(x => x.uuid === token).name, "says: " + msg)
-				id++
-				let idmessage = id
-				msgHistory.push({name:onlineUsers.find(x => x.uuid === token).name, message: msg})
-				io.emit("chat message", msg, onlineUsers.find(x => x.uuid === token).name, idmessage)
-			} else {
-				socket.emit("error", {error: true, msg:"Too many '<br>'s will fill up the screens for everyone else :( \nBut you knew that already didn't you?"})
-			}
-		} else {
-			socket.emit("error", {error: true, msg: "Please keep your message to a maximum of 1000 characters."})
-		}
-
-	})
-
 	socket.on("requestMessageHistory", (callback) => {
 		callback(msgHistory)
 	})
+
+	let finder = (value, param, search) => {
+		value.find(x => x[param] == search)
+	}
+
+	let cooldownManager = (token) => {
+		let find = cooldown.find(x => x.uuid == token)
+		if (find) {
+			if(find.msgcount <= 3){
+				find.msgcount = find.msgcount + 1
+				console.log(cooldown)
+			} else {
+				noType[token] = Date.now() + 10 * 1000
+				console.log(noType)
+			}
+		} else {
+			cooldown.push({uuid: token, msgcount: 1})
+			console.log(cooldown)
+		}
+	}
+
+	// Handles Chat messages
+	socket.on("chat message", (msg, token) => {
+		if (noType[token] <= Date.now() || noType[token] == undefined) {
+			if (msg.length <= 1000) {
+				let count = (msg.match(/br>/g) || []).length
+				if (count <= 20) {
+					console.log(onlineUsers.find(x => x.uuid === token).name, "says: " + msg)
+					id++
+					cooldownManager(token)
+					let idmessage = id
+					msgHistory.push({name:onlineUsers.find(x => x.uuid === token).name, message: msg})
+					io.emit("chat message", msg, onlineUsers.find(x => x.uuid === token).name, idmessage)
+				} else {
+					socket.emit("error", {error: true, msg:`Too many break charcaters will fill up the screens for everyone else <br>But you knew that already didn't you?`, buttonMsg: 'I am a bad person'})
+				}
+			} else {
+				socket.emit("error", {error: true, msg: `Please keep your message to a maximum of 1000 characters.`, buttonMsg: ' I really should have seen the super cool character count'})
+			}
+		} else {
+			socket.emit("error", {error: true, msg: `You have been rate limited because you are spamming.<br>Chill out for 10 seconds bro`, buttonMsg: `Enter the <b>CHILL ZONE</b>`})
+		}
+	})
+
+	let resetcooldown = () => {
+		cooldown.forEach(obj => {
+			obj.msgcount = 0
+		})
+	}
+	 
+	setInterval(resetcooldown, 10000)
 
 	// Typing
 	socket.on("typing", (data) => {
@@ -84,7 +117,18 @@ io.on("connection", (socket) => {
 			socket.broadcast.emit("typing", {user: data.user, typing: false})
 		}
 	})
+
+	socket.on("delete-message", (pw) => {
+		if (pw == 80085 || pw == 69420) {
+			socket.emit("error", {error: true, msg: "Nice try lmao", buttonMsg: "Try Again?"})
+		}
+		if (pw == "thisIsAVerySecurePassword") {
+			
+		}
+	})
+
 })
+
 
 // Listen on port 3000
 server.listen(3000, () => {
