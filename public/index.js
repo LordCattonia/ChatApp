@@ -35,6 +35,11 @@ socket.on("connect", () => {
 	applyMessageHistory()
 })
 
+socket.on("delete", (id) => {
+	console.log("attempting delete")
+	document.getElementById(`msg${id}`).innerHTML = 'moderator deleted message'
+})
+
 socket.on("token", (data) => {
 	console.log(`Client Token: ${data.token}`)
 	localStorage.setItem("token", data.token)

@@ -79,7 +79,7 @@ io.on("connection", (socket) => {
 					id++
 					cooldownManager(token)
 					let idmessage = id
-					msgHistory.push({name:onlineUsers.find(x => x.uuid === token).name, message: msg})
+					msgHistory.push({name:onlineUsers.find(x => x.uuid === token).name, message: msg, id: idmessage})
 					io.emit("chat message", msg, onlineUsers.find(x => x.uuid === token).name, idmessage)
 				} else {
 					socket.emit("error", {error: true, msg:`Too many break charcaters will fill up the screens for everyone else <br>But you knew that already didn't you?`, buttonMsg: 'I am a bad person'})
@@ -118,12 +118,19 @@ io.on("connection", (socket) => {
 		}
 	})
 
-	socket.on("delete-message", (pw) => {
+	socket.on("delete-message", (pw, id) => {
+		console.log("msg received", pw, id)
 		if (pw == 80085 || pw == 69420) {
+			console.log("incorrect")
 			socket.emit("error", {error: true, msg: "Nice try lmao", buttonMsg: "Try Again?"})
+		} else {
+			if (pw == "password-placeholder") {
+			console.log("correct")
+			io.emit("delete", id);
+			msgHistory.find(x => x.id == id).msg = "moderator deleted message"
+		} else {
+			console.log("incorrect password")
 		}
-		if (pw == "thisIsAVerySecurePassword") {
-			
 		}
 	})
 

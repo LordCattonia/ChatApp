@@ -98,7 +98,7 @@ body {
 }
 
 #messages>li:nth-child(odd) {
-	background: var(--second-background-color);
+	background: var(--second-background-colour);
 }
 
 #typing {
