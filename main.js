@@ -119,17 +119,18 @@ io.on("connection", (socket) => {
 	})
 
 	socket.on("delete-message", (pw, id) => {
-		console.log("msg received", pw, id)
 		if (pw == 80085 || pw == 69420) {
-			console.log("incorrect")
 			socket.emit("error", {error: true, msg: "Nice try lmao", buttonMsg: "Try Again?"})
 		} else {
 			if (pw == "password-placeholder") {
-			console.log("correct")
-			io.emit("delete", id);
-			msgHistory.find(x => x.id == id).msg = "moderator deleted message"
+					try {
+						msgHistory.find(x => x.id == id).message = "moderator deleted message"
+						msgHistory.find(x => x.id == id).name = null
+						io.emit("delete", id);
+					} catch(err) {
+						console.log("deletion failed")
+					}
 		} else {
-			console.log("incorrect password")
 		}
 		}
 	})

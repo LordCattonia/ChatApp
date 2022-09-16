@@ -31,8 +31,6 @@ socket.on("connect", () => {
 	socket.emit("token", {
 		token: localStorage.getItem("token")
 	})
-	requestMessageHistory()
-	applyMessageHistory()
 })
 
 socket.on("delete", (id) => {
@@ -52,17 +50,11 @@ let resetToken = () => {
 	window.location.reload()
 }
 
-let requestMessageHistory = () => {
-	socket.emit("requestMessageHistory", (history) => {
-		msgHistory = history
-	})
-}
-
-let applyMessageHistory = () => {
+let applyMessageHistory = (history) => {
 	socket.emit("peekID", (id) => {
 		if (id > 0) {
 			let i = 0
-			msgHistory.forEach((object) => {
+			history.forEach((object) => {
 				let item = "How did you send this?"
 				item = `<li id="msg${i}">${object.name}: ${object.message}</li>`
 				i++
@@ -72,6 +64,15 @@ let applyMessageHistory = () => {
 		}
 	})
 }
+
+let requestMessageHistory = () => {
+	socket.emit("requestMessageHistory", (history) => {
+		msgHistory = history
+		applyMessageHistory(msgHistory)
+	})
+}
+
+requestMessageHistory()
 
 // Toggles light and dark mode
 let toggleDarkMode = () => {
@@ -100,10 +101,14 @@ form.addEventListener("submit", (e) => {
 	if (Username === null || Username === "") {
 		document.getElementById("id01").style.display = "block"
 	} else {
-		if (input.value) {
-			socket.emit("chat message", input.value, token)
-			input.value = ``
-			current.innerHTML = 0
+		if(input.value.charAt(0) == "?") {
+			runCommand(input.value)
+		} else {
+			if (input.value) {
+				socket.emit("chat message", input.value, token)
+				input.value = ``
+				current.innerHTML = 0
+			}
 		}
 	}
 })
@@ -122,6 +127,11 @@ socket.on("chat message", (msg, usr, id) => {
 	list.insertAdjacentHTML("beforeend", item)
 	window.scrollTo(0, document.body.scrollHeight)
 })
+
+// This script runs commands
+let runCommand = (command) => {
+
+}
 
 // Typing
 document.getElementById("input").addEventListener("keydown", () => {
