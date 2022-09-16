@@ -1,8 +1,17 @@
+:root {
+	--text-colour: #fff;
+	--background-colour: #333;
+	--second-background-colour: #353535;
+	--header-colour: #222;
+	--modal-colour: #aaa;
+}
+
 body {
 	margin: 0;
 	padding-bottom: 3rem;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 	overflow-x: hidden;  
+	background-color: var(--background-colour);
 }
 
 ::-webkit-scrollbar {
@@ -11,7 +20,7 @@ body {
   
 /* Track */
 ::-webkit-scrollbar-track {
-	background: #f1f1f1; 
+	background: var(--background-colour); 
 }
    
   /* Handle */
@@ -41,6 +50,7 @@ body {
 
 #input {
 	border: none;
+	color: var(--text-colour);
 	padding: 0 1rem;
 	flex-grow: 1;
 	border-radius: 2rem;
@@ -55,13 +65,17 @@ body {
 }
 
 #form>button {
-	background: #333;
+	background: var(--background-colour);
 	border: none;
 	padding: 0 1rem;
 	margin: 0.25rem;
 	border-radius: 3px;
 	outline: none;
 	color: #fff;
+}
+
+#form>input {
+	background: var(--second-background-colour);
 }
 
 #boxBoy {
@@ -76,6 +90,7 @@ body {
 }
 
 #messages>li {
+	color: var(--text-colour);
 	padding: 0.5rem 1rem;
 	overflow-wrap: break-word;
 	word-wrap: break-word;
@@ -83,7 +98,7 @@ body {
 }
 
 #messages>li:nth-child(odd) {
-	background: #efefef;
+	background: var(--second-background-color);
 }
 
 #typing {
@@ -120,13 +135,18 @@ input[type="password"]:focus {
 	outline: none;
 }
 
+.center {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
 /* Extra styles for the cancel button */
 .cancelbtn {
 	padding: 14px 20px;
 	background-color: #33ff4b;
 }
 
-/* This will align items right :) */
+/* This will align items left and right :) */
 .Opposites {
 	display: flex;
 	justify-content: space-between;
@@ -153,26 +173,34 @@ input[type="password"]:focus {
 	/* Full height */
 	overflow: auto;
 	/* Enable scroll if needed */
-	background-color: transparent;
-	/* To make it invisible*/
+	background-color: var(--background-colour);
+	/* Make the backround white */
 	padding-top: 50px;
 }
 
 /* Modal Content/Box */
 .modal-content {
-	background-color: #fefefe;
+	background-color: var(--modal-colour);
 	margin: 5% auto 15% auto;
 	/* 5% from the top, 15% from the bottom and centered */
-	border: 1px solid #888;
+	border: 1px solid var(--second-background-color);
 	width: 40%;
 	/* Could be more or less, depending on screen size */
+}
+
+.thin {
+	width: 20%;
+}
+
+.content-container {
+	padding: 1.25rem;
 }
 
 header {
 	position: sticky;
 	width: 100%;
 	top: 0px;
-	background: #a1a1a1;
+	background: var(--header-colour);
 	color: #eeeeee;
 	padding: 1px;
 	font-size: small;
@@ -181,8 +209,12 @@ header {
 
 /* Style the horizontal ruler */
 hr {
-	border: 1px solid #f1f1f1;
+	border: 1px solid var(--text-colour);
 	margin-bottom: 25px;
+}
+
+.rounded {
+	border-radius: 20px;
 }
 
 /* Clear floats */

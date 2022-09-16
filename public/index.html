@@ -13,7 +13,7 @@
 				<p>
 					This application allows HTML and CSS styling for your messages. Click
 					<a href="https://google.github.io/styleguide/htmlcssguide.html">here</a>
-					for more info about this
+					for more info about this <br>
 				</p>
 				<button onclick="document.getElementById('id01').style.display='block'" id="userbtn">
 					Change Username
@@ -22,8 +22,8 @@
 		</header>
 		<!-- Enter username Modal -->
 		<div id="id01" class="modal">
-			<form class="modal-content" method="dialog" onsubmit="return checkForm(this);">
-				<div class="container">
+			<form class="modal-content rounded" method="dialog" onsubmit="return checkForm(this);">
+				<div class="container rounded">
 					<h3>Sign up</h3>
 					<p>Please enter your username</p>
 					<hr/>
@@ -46,6 +46,14 @@
 					</div>
 				</div>
 			</form>
+		</div>
+		<div class="modal" id="errorModal">
+			<div class="modal-content rounded thin">
+				<div class="content-container rounded">
+					<h3 id="error-message" class="margin: 10px;">error placeholder</h3>
+					<button id="errorButton" style="background-color:red; margin: 10px;" class="cancelbtn centre" onclick="document.getElementById('errorModal').style.display = 'none'" type="button1">Ok!</button>
+				</div>
+			</div>
 		</div>
 		<ul id="messages"></ul>
 		<p id="typing" style="display: none">

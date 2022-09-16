@@ -12,7 +12,13 @@ const input = document.getElementById("input")
 const nameDisplay = document.getElementById("id02")
 const typingBox = document.getElementById("typing")
 const current = document.getElementById("current")
+const errorText = document.getElementById("error-message")
+const errorModal = document.getElementById("errorModal")
+const errorButton = document.getElementById("errorButton")
+const colourToggle = document.getElementById("colour-toggle")
+const r = document.querySelector(':root');
 
+let isDarkMode = true
 let token
 let typing = []
 let msgHistory = []
@@ -61,6 +67,28 @@ let applyMessageHistory = () => {
 		}
 	})
 }
+
+// Toggles light and dark mode
+let toggleDarkMode = () => {
+	if (isDarkMode){
+		colourToggle.innerHTML = "Click here to turn on dark mode"
+		r.style.setProperty('--text-colour', '#000')
+		r.style.setProperty('--background-colour', '#fff')
+		r.style.setProperty('--second-background-colour', '#ddd')
+		r.style.setProperty('--header-colour', '#lightgrey')
+		r.style.setProperty('--modal-colour', '#fefefe')
+		isDarkMode = false
+	} else {
+		colourToggle.innerHTML = "Click here to turn on light mode"
+		r.style.setProperty('--text-colour', '#fff')
+		r.style.setProperty('--background-colour', '#333')
+		r.style.setProperty('--second-background-colour', '#353535')
+		r.style.setProperty('--header-colour', '#222')
+		r.style.setProperty('--modal-colour', '#aaa')
+		isDarkMode = true
+	}
+}
+
 // The script sends messages
 form.addEventListener("submit", (e) => {
 	e.preventDefault()
@@ -69,13 +97,17 @@ form.addEventListener("submit", (e) => {
 	} else {
 		if (input.value) {
 			socket.emit("chat message", input.value, token)
+			input.value = ``
+			current.innerHTML = 0
 		}
 	}
 })
 // This script recieves any errors and alerts the user
 socket.on("error", (data) => {
 	if(data.error){
-		alert(data.msg)
+		errorModal.style.display = 'block'
+		errorText.innerHTML = data.msg
+		errorButton.innerHTML = data.buttonMsg
 	}
 })
 // This script recieves messages
