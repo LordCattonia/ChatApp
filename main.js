@@ -49,10 +49,6 @@ io.on("connection", (socket) => {
 		callback(msgHistory)
 	})
 
-	let finder = (value, param, search) => {
-		value.find(x => x[param] == search)
-	}
-
 	let cooldownManager = (token) => {
 		let find = cooldown.find(x => x.uuid == token)
 		if (find) {
@@ -130,11 +126,15 @@ io.on("connection", (socket) => {
 					} catch(err) {
 						console.log("deletion failed")
 					}
-		} else {
 		}
 		}
 	})
+	// Handle commands
+	socket.on("command", (data) => {
+		if (data.valid) {
 
+		}
+	})
 })
 
 

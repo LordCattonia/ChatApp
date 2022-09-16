@@ -55,7 +55,7 @@ let applyMessageHistory = (history) => {
 		if (id > 0) {
 			let i = 0
 			history.forEach((object) => {
-				let item = "How did you send this?"
+				let item
 				item = `<li id="msg${i}">${object.name}: ${object.message}</li>`
 				i++
 				list.insertAdjacentHTML("beforeend", item.toString())
@@ -122,7 +122,7 @@ socket.on("error", (data) => {
 })
 // This script recieves messages
 socket.on("chat message", (msg, usr, id) => {
-	let item = "How did you send this?"
+	let item
 	item = `<li id="msg${id}">${usr}: ${msg}</li>`
 	list.insertAdjacentHTML("beforeend", item)
 	window.scrollTo(0, document.body.scrollHeight)
@@ -130,6 +130,11 @@ socket.on("chat message", (msg, usr, id) => {
 
 // This script runs commands
 let runCommand = (command) => {
+	if(command.match("/^[\w ]+$/")) {
+		socket.emit("command", {valid: true, command: command, uuid: token})
+	} else {
+		socket.emit("command", {valid: false})
+	}
 
 }
 
@@ -171,7 +176,7 @@ let checkForm = (form) => {
 	}
 
 	// regular expression to match only alphanumeric characters and spaces
-	var re = /^[\w ]+$/
+	let re = /^[\w ]+$/
 
 	// validation fails if the input doesn't match our regular expression
 	if (!re.test(form.userbox.value)) {
@@ -196,7 +201,7 @@ let checkForm = (form) => {
 // This function sets username when you submit the modal
 let setUsername = () => {
 	window.localStorage.removeItem("username")
-	if (rember.checked == true) {
+	if (rember.checked) {
 		window.localStorage.setItem("username", username.value)
 		Username = window.localStorage.getItem("username")
 		nameDisplay.innerHTML = "Username: " + Username
