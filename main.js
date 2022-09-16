@@ -6,12 +6,17 @@ const { Server } = require("socket.io")
 const io = new Server(server)
 const uuid = require("uuid")
 
+let prefix = "?"
 let timeOut
 let noType = {}
 let cooldown = []
 let onlineUsers = []
-let id = 0
 let msgHistory = []
+
+let serverMessage = (message) => {
+	io.emit("chat message", message, "Server", msgHistory.length + 1)
+	msgHistory.push({name:"Server", message: message, id: msgHistory.length + 1})
+}
 
 // Serve public folder to client
 
@@ -42,7 +47,7 @@ io.on("connection", (socket) => {
 	})
 
 	socket.on("peekID", (callback) => {
-		callback(id)
+		callback(msgHistory.length)
 	})
 
 	socket.on("requestMessageHistory", (callback) => {
@@ -72,9 +77,8 @@ io.on("connection", (socket) => {
 				let count = (msg.match(/br>/g) || []).length
 				if (count <= 20) {
 					console.log(onlineUsers.find(x => x.uuid === token).name, "says: " + msg)
-					id++
 					cooldownManager(token)
-					let idmessage = id
+					let idmessage = msgHistory.length + 1
 					msgHistory.push({name:onlineUsers.find(x => x.uuid === token).name, message: msg, id: idmessage})
 					io.emit("chat message", msg, onlineUsers.find(x => x.uuid === token).name, idmessage)
 				} else {
@@ -131,8 +135,12 @@ io.on("connection", (socket) => {
 	})
 	// Handle commands
 	socket.on("command", (data) => {
-		if (data.valid) {
+		if(!data.command.startsWith(prefix)) return
+		let args = data.command.slice(prefix.length).trim().split(/ +/)
+		let command = args.shift().toLowerCase()
 
+		if(command == "test"){
+			serverMessage(args[0] || "Empty")
 		}
 	})
 })

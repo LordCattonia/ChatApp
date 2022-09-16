@@ -101,14 +101,11 @@ form.addEventListener("submit", (e) => {
 	if (Username === null || Username === "") {
 		document.getElementById("id01").style.display = "block"
 	} else {
-		if(input.value.charAt(0) == "?") {
-			runCommand(input.value)
-		} else {
-			if (input.value) {
-				socket.emit("chat message", input.value, token)
-				input.value = ``
-				current.innerHTML = 0
-			}
+		if (input.value) {
+			socket.emit("chat message", input.value, token)
+			socket.emit("command", {command: input.value, uuid: token})
+			input.value = ``
+			current.innerHTML = 0
 		}
 	}
 })
@@ -127,16 +124,6 @@ socket.on("chat message", (msg, usr, id) => {
 	list.insertAdjacentHTML("beforeend", item)
 	window.scrollTo(0, document.body.scrollHeight)
 })
-
-// This script runs commands
-let runCommand = (command) => {
-	if(command.match("/^[\w ]+$/")) {
-		socket.emit("command", {valid: true, command: command, uuid: token})
-	} else {
-		socket.emit("command", {valid: false})
-	}
-
-}
 
 // Typing
 document.getElementById("input").addEventListener("keydown", () => {
