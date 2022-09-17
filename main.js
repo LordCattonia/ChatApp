@@ -10,6 +10,7 @@ const uuid = require("uuid")
 let modList = ["78e05e77-c2da-4e68-b8d8-011004677f87"]
 let prefix = "?"
 let timeOut
+let ipAddresss
 let noType = {}
 let cooldown = []
 let onlineUsers = []
@@ -37,19 +38,15 @@ let getClientIp = (req) => {
 };
 //Part3, Blocking Client IP, if it is in the banned
 app.use(function(req, res, next) {
-  	let ipAddress = getClientIp(req);
+  	let ipAddress = getClientIp(req)
+	ipAddresss = ipAddress
   	if(banned.indexOf(ipAddress) === -1){
     	next();
   	} else {
     	res.send(`IP: ${ipAddress} is not in whiteList`)
   	}
 })
-app.get('/public', function (req, res) {
-	res.sendFile(__dirname + "index.html")
-	res.sendFile(__dirname + "style.css")
-	res.sendFile(__dirname + "index.js")
-	ipPurg.push(getClientIp(req))
-})
+app.use(express.static('public'))
 // Sockets
 
 io.on("connection", (socket) => {
@@ -71,7 +68,7 @@ io.on("connection", (socket) => {
 			onlineUsers.find(x => x.uuid == token).name = Username
 		} else {
 			onlineUsers.push({uuid: token, name: Username})
-			ipList.push({ip: ipPurg[ipPurg.length - 1], uuid: token})
+			ipList.push({ip: ipAddresss, uuid: token})
 		}
 	})
 
@@ -88,14 +85,11 @@ io.on("connection", (socket) => {
 		if (find) {
 			if(find.msgcount <= 3){
 				find.msgcount = find.msgcount + 1
-				console.log(cooldown)
 			} else {
 				noType[token] = Date.now() + 10 * 1000
-				console.log(noType)
 			}
 		} else {
 			cooldown.push({uuid: token, msgcount: 1})
-			console.log(cooldown)
 		}
 	}
 
@@ -173,15 +167,20 @@ io.on("connection", (socket) => {
 			serverMessage(args[0] || "Please input a message")
 		}
 
+		if (command == "debug") {
+			console.log(ipList, ipPurg, banned)
+		}
+
 		if(command == "ban") {
 			try {
 				if (!modList.includes(data.uuid)) throw "noPerms"
+				if (!args[0]) throw "invalid"
 				if (onlineUsers.some(x => x.name === args[0])) {
 
 				} else if (onlineUsers.some(x => x.token === args[0])) {
 
 				} else {
-					
+					throw "invalid"
 				}
 			} catch(err) {
 				if(err == "noPerms") {
