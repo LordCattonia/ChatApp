@@ -1,3 +1,4 @@
+const e = require("express")
 const express = require("express")
 const app = express()
 const http = require("http")
@@ -6,22 +7,49 @@ const { Server } = require("socket.io")
 const io = new Server(server)
 const uuid = require("uuid")
 
+let modList = ["78e05e77-c2da-4e68-b8d8-011004677f87"]
 let prefix = "?"
 let timeOut
 let noType = {}
 let cooldown = []
 let onlineUsers = []
 let msgHistory = []
+let banned = []
+let ipPurg = []
+let ipList = []
 
 let serverMessage = (message) => {
-	io.emit("chat message", message, "Server", msgHistory.length + 1)
-	msgHistory.push({name:"Server", message: message, id: msgHistory.length + 1})
+	io.emit("chat message", message, "Server", msgHistory.length)
+	msgHistory.push({name:"Server", message: message, id: msgHistory.length})
 }
 
-// Serve public folder to client
-
-app.use(express.static('public'))
-
+// Part2, Geting client IP
+let getClientIp = (req) => {
+  let ipAddress = req.connection.remoteAddress;
+	if (!ipAddress) {
+    	return '';
+  	}
+// convert from "::ffff:192.0.0.1"  to "192.0.0.1"
+  	if (ipAddress.substr(0, 7) == "::ffff:") {
+    	ipAddress = ipAddress.substr(7)
+ 	}
+	return ipAddress;
+};
+//Part3, Blocking Client IP, if it is in the banned
+app.use(function(req, res, next) {
+  	let ipAddress = getClientIp(req);
+  	if(banned.indexOf(ipAddress) === -1){
+    	next();
+  	} else {
+    	res.send(`IP: ${ipAddress} is not in whiteList`)
+  	}
+})
+app.get('/public', function (req, res) {
+	res.sendFile(__dirname + "index.html")
+	res.sendFile(__dirname + "style.css")
+	res.sendFile(__dirname + "index.js")
+	ipPurg.push(getClientIp(req))
+})
 // Sockets
 
 io.on("connection", (socket) => {
@@ -43,11 +71,12 @@ io.on("connection", (socket) => {
 			onlineUsers.find(x => x.uuid == token).name = Username
 		} else {
 			onlineUsers.push({uuid: token, name: Username})
+			ipList.push({ip: ipPurg[ipPurg.length - 1], uuid: token})
 		}
 	})
 
 	socket.on("peekID", (callback) => {
-		callback(msgHistory.length)
+		callback(msgHistory.length - 1)
 	})
 
 	socket.on("requestMessageHistory", (callback) => {
@@ -78,7 +107,7 @@ io.on("connection", (socket) => {
 				if (count <= 20) {
 					console.log(onlineUsers.find(x => x.uuid === token).name, "says: " + msg)
 					cooldownManager(token)
-					let idmessage = msgHistory.length + 1
+					let idmessage = msgHistory.length
 					msgHistory.push({name:onlineUsers.find(x => x.uuid === token).name, message: msg, id: idmessage})
 					io.emit("chat message", msg, onlineUsers.find(x => x.uuid === token).name, idmessage)
 				} else {
@@ -138,9 +167,29 @@ io.on("connection", (socket) => {
 		if(!data.command.startsWith(prefix)) return
 		let args = data.command.slice(prefix.length).trim().split(/ +/)
 		let command = args.shift().toLowerCase()
+		let noPerms = `Sorry ${onlineUsers.find(x => x.uuid == data.uuid).name}, you do not have permissions to use this command`
 
-		if(command == "test"){
-			serverMessage(args[0] || "Empty")
+		if(command == "say"){
+			serverMessage(args[0] || "Please input a message")
+		}
+
+		if(command == "ban") {
+			try {
+				if (!modList.includes(data.uuid)) throw "noPerms"
+				if (onlineUsers.some(x => x.name === args[0])) {
+
+				} else if (onlineUsers.some(x => x.token === args[0])) {
+
+				} else {
+					
+				}
+			} catch(err) {
+				if(err == "noPerms") {
+					serverMessage(noPerms)
+				} else {
+					serverMessage("Make sure to put in a valid username. Usage: <code>?ban {username|uuid}</code>")
+				}
+			}
 		}
 	})
 })

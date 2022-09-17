@@ -117,6 +117,12 @@ body {
 	box-sizing: border-box;
 }
 
+code {
+	background-color: #000;
+	border: 1px solid #222;
+	padding: 2.5px;
+  }
+
 /* Full-width input fields */
 input[type="text"],
 input[type="password"] {
