@@ -6,18 +6,40 @@ const server = http.createServer(app)
 const { Server } = require("socket.io")
 const io = new Server(server)
 const uuid = require("uuid")
+const fs = require('fs');
+const bannedlist = require('./banned.json'); 
+const banned = JSON.parse(JSON.stringify(bannedlist)).bannedIPS
 
 let modList = ["78e05e77-c2da-4e68-b8d8-011004677f87"]
 let prefix = "?"
 let timeOut
-let ipAddresss
 let noType = {}
 let cooldown = []
 let onlineUsers = []
 let msgHistory = []
-let banned = []
 let ipPurg = []
 let ipList = []
+
+let saveJSON = (jsonData) => {
+	fs.readFile('./banned.json', 'utf8', function (err, data) {
+		if (err) {
+			console.log(err)
+		} else {
+			const file = JSON.parse(data);
+			file.bannedIPS = jsonData
+
+			const json = JSON.stringify(file);
+	
+			fs.writeFile('banned.json', json, 'utf8', function(err){
+				if(err){ 
+					console.log(err); 
+				} else {
+					console.log("ips were successfully added to banlist")
+				}});
+		}
+	
+	});
+}
 
 let serverMessage = (message) => {
 	io.emit("chat message", message, "Server", msgHistory.length)
@@ -39,9 +61,13 @@ let getClientIp = (req) => {
 //Part3, Blocking Client IP, if it is in the banned
 app.use(function(req, res, next) {
   	let ipAddress = getClientIp(req)
-	ipAddresss = ipAddress
   	if(banned.indexOf(ipAddress) === -1){
-    	next();
+    	if(ipPurg.indexOf(ipAddress) === -1) {
+			ipPurg.push(ipAddress)
+		} else {
+			console.log(`ip: ${ipAddress} already logged`)
+		}
+		next();
   	} else {
     	res.send(`IP: ${ipAddress} is not in whiteList`)
   	}
@@ -64,12 +90,7 @@ io.on("connection", (socket) => {
 
 	// Handles Username + UUID Pairs
 	socket.on("Username", (token, Username) => {
-		if(onlineUsers.find(x => x.uuid == token)){
-			onlineUsers.find(x => x.uuid == token).name = Username
-		} else {
-			onlineUsers.push({uuid: token, name: Username})
-			ipList.push({ip: ipAddresss, uuid: token})
-		}
+		onlineUsers.findIndex(x => x.uuid == token) === -1 ? onlineUsers.push({uuid: token, name: Username}) : onlineUsers.find(x => x.uuid == token).name = Username
 	})
 
 	socket.on("peekID", (callback) => {
@@ -120,7 +141,13 @@ io.on("connection", (socket) => {
 			obj.msgcount = 0
 		})
 	}
-	 
+	
+	let mapIps = () => {
+		ipList = onlineUsers.map(obj => ({ip: ipPurg[onlineUsers.indexOf(obj)], uuid: obj.uuid}))
+	}
+
+	setInterval(mapIps, 100)
+
 	setInterval(resetcooldown, 10000)
 
 	// Typing
@@ -176,9 +203,14 @@ io.on("connection", (socket) => {
 				if (!modList.includes(data.uuid)) throw "noPerms"
 				if (!args[0]) throw "invalid"
 				if (onlineUsers.some(x => x.name === args[0])) {
-
+					let uuid = onlineUsers.find(x => x.name === args[0]).uuid
+					console.log(uuid)
+					banned.push(ipList.find(x => x.uuid == uuid).ip)
+					console.log(ipList.find(x => x.uuid == uuid))
+					saveJSON(banned)
 				} else if (onlineUsers.some(x => x.token === args[0])) {
-
+					banned.push(ipList.find(x => x.uuid == args[0]).ip)
+					saveJSON(banned)
 				} else {
 					throw "invalid"
 				}
@@ -186,9 +218,16 @@ io.on("connection", (socket) => {
 				if(err == "noPerms") {
 					serverMessage(noPerms)
 				} else {
-					serverMessage("Make sure to put in a valid username. Usage: <code>?ban {username|uuid}</code>")
+					//serverMessage("Make sure to put in a valid username. Usage: <code>?ban {username|uuid}</code>")
+					console.log(err)
 				}
 			}
+		}
+		
+		if (command == 'online') {
+			onlineUsers.forEach(obj => {
+				serverMessage(JSON.stringify(obj))
+			})
 		}
 	})
 })
