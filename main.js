@@ -1,4 +1,3 @@
-const e = require("express")
 const express = require("express")
 const app = express()
 const http = require("http")
@@ -17,8 +16,6 @@ let noType = {}
 let cooldown = []
 let onlineUsers = []
 let msgHistory = []
-let ipPurg = []
-let ipList = []
 
 let saveJSON = (jsonData) => {
 	fs.readFile('./banned.json', 'utf8', function (err, data) {
@@ -45,7 +42,6 @@ let serverMessage = (message) => {
 	io.emit("chat message", message, "Server", msgHistory.length)
 	msgHistory.push({name:"Server", message: message, id: msgHistory.length})
 }
-
 // Part2, Geting client IP
 let getClientIp = (req) => {
   let ipAddress = req.connection.remoteAddress;
@@ -62,11 +58,6 @@ let getClientIp = (req) => {
 app.use(function(req, res, next) {
   	let ipAddress = getClientIp(req)
   	if(banned.indexOf(ipAddress) === -1){
-    	if(ipPurg.indexOf(ipAddress) === -1) {
-			ipPurg.push(ipAddress)
-		} else {
-			console.log(`ip: ${ipAddress} already logged`)
-		}
 		next();
   	} else {
     	res.send(`IP: ${ipAddress} is not in whiteList`)
@@ -90,7 +81,7 @@ io.on("connection", (socket) => {
 
 	// Handles Username + UUID Pairs
 	socket.on("Username", (token, Username) => {
-		onlineUsers.findIndex(x => x.uuid == token) === -1 ? onlineUsers.push({uuid: token, name: Username}) : onlineUsers.find(x => x.uuid == token).name = Username
+		onlineUsers.findIndex(x => x.uuid == token) === -1 ? onlineUsers.push({uuid: token, name: Username, socketId: socket.id, ip: socket.address}) : onlineUsers.find(x => x.uuid == token).name = Username
 	})
 
 	socket.on("peekID", (callback) => {
@@ -141,10 +132,6 @@ io.on("connection", (socket) => {
 			obj.msgcount = 0
 		})
 	}
-	
-	let mapIps = () => {
-		ipList = onlineUsers.map(obj => ({ip: ipPurg[onlineUsers.indexOf(obj)], uuid: obj.uuid}))
-	}
 
 	setInterval(mapIps, 100)
 
@@ -163,7 +150,7 @@ io.on("connection", (socket) => {
 				socket.broadcast.emit("typing", {user: data.user, typing: false})
 			}, 1000)
 		} else {
-			console.log(user, "stopped typing")
+			console.log(data.user, "stopped typing")
 			socket.broadcast.emit("typing", {user: data.user, typing: false})
 		}
 	})
@@ -185,6 +172,9 @@ io.on("connection", (socket) => {
 	})
 	// Handle commands
 	socket.on("command", (data) => {
+		let serverPrivateMessage = (message) => {
+			socket.emit("chat message", message, "Server", msgHistory.length)
+		}
 		if(!data.command.startsWith(prefix)) return
 		let args = data.command.slice(prefix.length).trim().split(/ +/)
 		let command = args.shift().toLowerCase()
@@ -195,30 +185,27 @@ io.on("connection", (socket) => {
 		}
 
 		if (command == "debug") {
-			console.log(ipList, ipPurg, banned)
+			console.log(socket)
 		}
 
 		if(command == "ban") {
 			try {
-				if (!modList.includes(data.uuid)) throw "noPerms"
-				if (!args[0]) throw "invalid"
+				if (!modList.includes(data.uuid)) throw Error("noPerms")
+				if (!args[0]) throw Error("invalid")
 				if (onlineUsers.some(x => x.name === args[0])) {
-					let uuid = onlineUsers.find(x => x.name === args[0]).uuid
-					console.log(uuid)
-					banned.push(ipList.find(x => x.uuid == uuid).ip)
-					console.log(ipList.find(x => x.uuid == uuid))
+					banned.push(onlineUsers.find(x => x.name == args[0]).ip)
 					saveJSON(banned)
 				} else if (onlineUsers.some(x => x.token === args[0])) {
-					banned.push(ipList.find(x => x.uuid == args[0]).ip)
+					banned.push(onlineUsers.find(x => x.uuid == args[0]).ip)
 					saveJSON(banned)
 				} else {
-					throw "invalid"
+					throw Error("invalid")
 				}
 			} catch(err) {
-				if(err == "noPerms") {
+				if(err.message == "noPerms") {
 					serverMessage(noPerms)
 				} else {
-					//serverMessage("Make sure to put in a valid username. Usage: <code>?ban {username|uuid}</code>")
+					serverPrivateMessage("Make sure to put in a valid username. Usage: <code>?ban {username|uuid}</code>")
 					console.log(err)
 				}
 			}
@@ -226,8 +213,31 @@ io.on("connection", (socket) => {
 		
 		if (command == 'online') {
 			onlineUsers.forEach(obj => {
-				serverMessage(JSON.stringify(obj))
+				serverPrivateMessage(JSON.stringify(obj))
 			})
+		}
+
+		if (command == 'kick') {
+			try {
+				if (!modList.includes(data.uuid)) throw Error("noPerms")
+				if (!args[0]) throw Error("invalid")
+				if (onlineUsers.some(x => x.name === args[0])) {
+					let uuid = onlineUsers.find(x => x.name === args[0]).uuid
+					console.log(onlineUsers.find(x => x.uuid == uuid).socketId)
+					socket.to(onlineUsers.find(x => x.uuid == uuid).socketId).emit("chat message", "kys", "kys", "kys")
+				} else if (onlineUsers.some(x => x.token === args[0])) {
+					socket.to(onlineUsers.find(x => x.uuid == args[0]).socketId).emit("chat message", "kys", "kys", "kys")
+				} else {
+					throw Error("invalid")
+				}
+			} catch(err) {
+				if(err.message == "noPerms") {
+					serverMessage(noPerms)
+				} else {
+					serverPrivateMessage("Make sure to put in a valid username. Usage: <code>?kick {username|uuid}</code>")
+					console.log(err)
+				}
+			}
 		}
 	})
 })

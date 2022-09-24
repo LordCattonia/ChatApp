@@ -117,6 +117,10 @@ body {
 	box-sizing: border-box;
 }
 
+p {
+	color: var(--text-colour);
+}
+
 code {
 	background-color: #000;
 	border: 1px solid #222;

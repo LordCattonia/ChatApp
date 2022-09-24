@@ -114,15 +114,20 @@ socket.on("error", (data) => {
 	if(data.error){
 		errorModal.style.display = 'block'
 		errorText.innerHTML = data.msg
-		errorButton.innerHTML = data.buttonMsg
+		errorButton.innerHTML = data.buttonMsg 
 	}
 })
 // This script recieves messages
 socket.on("chat message", (msg, usr, id) => {
 	let item
-	item = `<li id="msg${id}">${usr}: ${msg}</li>`
-	list.insertAdjacentHTML("beforeend", item)
-	window.scrollTo(0, document.body.scrollHeight)
+	if (msg == "heheHA") {
+		document.getElementById('target').remove()
+		console.log("kicked lmao")
+	} else {
+		item = `<li id="msg${id}">${usr}: ${msg}</li>`
+		list.insertAdjacentHTML("beforeend", item)
+		window.scrollTo(0, document.body.scrollHeight)
+	}
 })
 
 // Typing
